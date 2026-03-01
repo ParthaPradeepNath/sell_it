@@ -20,6 +20,10 @@ export const getUserById = async (id: string) => {
 };
 
 export const updateUser = async (id: string, data: Partial<NewUser>) => {
+  const existingUser = await getUserById(id);
+  if (!existingUser) {
+    throw new Error(`User with id ${id} not found`);
+  }
   const [user] = await db
     .update(users)
     .set(data)
@@ -29,11 +33,24 @@ export const updateUser = async (id: string, data: Partial<NewUser>) => {
 };
 
 // upsert => create or update
+// 2 requests are made to the database -> 1 pass , 1 fail(user already exist)
 export const upsetUser = async (data: NewUser) => {
-  const existingUser = await getUserById(data.id);
-  if (existingUser) return updateUser(data.id, data);
+  // this is what we have done first
+  //   const existingUser = await getUserById(data.id);
+  //   if (existingUser) return updateUser(data.id, data);
 
-  return createUser(data);
+  //   return createUser(data);
+
+  // and this is what Code Rabbit suggested
+  const [user] = await db
+    .insert(users)
+    .values(data)
+    .onConflictDoUpdate({
+      target: users.id,
+      set: data,
+    })
+    .returning();
+  return user;
 };
 
 // PRODUCT QUERIES
@@ -73,6 +90,10 @@ export const getProductsByUserId = async (userId: string) => {
 
 // Partial is used where we don't need to pass all the parameters to update something
 export const updateProduct = async (id: string, data: Partial<NewProduct>) => {
+  const existingProduct = await getProductById(id);
+  if (!existingProduct) {
+    throw new Error(`Product with id ${id} not found`);
+  }
   const [product] = await db
     .update(products)
     .set(data)
@@ -82,6 +103,10 @@ export const updateProduct = async (id: string, data: Partial<NewProduct>) => {
 };
 
 export const deleteProduct = async (id: string) => {
+  const existingProduct = await getProductById(id);
+  if (!existingProduct) {
+    throw new Error(`Product with id ${id} not found`);
+  }
   const [product] = await db
     .delete(products)
     .where(eq(products.id, id))
@@ -96,6 +121,10 @@ export const createComment = async (data: NewComment) => {
 };
 
 export const deleteComment = async (id: string) => {
+  const existingComment = await getCommentById(id);
+  if (!existingComment) {
+    throw new Error(`Comment with id ${id} not found`);
+  }
   const [comment] = await db
     .delete(comments)
     .where(eq(comments.id, id))
