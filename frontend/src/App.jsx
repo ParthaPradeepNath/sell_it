@@ -5,9 +5,15 @@ import ProductPage from './pages/ProductPage'
 import ProfilePage from './pages/ProfilePage'
 import CreatePage from './pages/CreatePage'
 import EditProductPage from './pages/EditProductPage'
+import useUserSync from './hooks/useUserSync'
+import useAuthReq from './hooks/useAuthReq'
+
 
 function App() {
+  const { isClerkLoaded, isSignedIn} = useAuthReq();
+  useUserSync()
 
+  if (!isClerkLoaded) return null;
 
   return (
 
