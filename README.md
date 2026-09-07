@@ -50,16 +50,16 @@ A full-stack product-sharing platform where creators can **upload, discover, and
 A traditional monorepo with two independently deployable services:
 
 ```
-        ┌──────────────────┐       REST /api (Bearer token)      ┌──────────────────┐
-        │    Frontend      │ ────────────────────────────────► │     Backend      │
-        │  React + Vite    │ ◄──────────────────────────────── │ Express + Drizzle│
-        │    Clerk UI      │          JSON responses           │  Clerk (requireAuth)
-        └──────────────────┘                                   └────────┬─────────┘
-                                                                        │   SQL
-                                                              ┌─────────▼─────────┐
-                                                              │     PostgreSQL    │
-                                                              │       (Neon)      │
-                                                              └───────────────────┘
+        ┌──────────────────────┐     REST /api (Bearer token)    ┌──────────────────────┐
+        │       Frontend       │ ──────────────────────────────► │       Backend        │
+        │     React + Vite     │ ◄────────────────────────────── │  Express + Drizzle   │
+        │       Clerk UI       │         JSON responses          │ Clerk (requireAuth)  │
+        └──────────────────────┘                                 └───────────┬──────────┘
+                                                                             │   SQL
+                                                                 ┌───────────▼──────────┐
+                                                                 │      PostgreSQL      │
+                                                                 │        (Neon)        │
+                                                                 └──────────────────────┘
 ```
 
 **Auth flow**
